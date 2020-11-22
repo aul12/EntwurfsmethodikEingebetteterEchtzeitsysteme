@@ -1,0 +1,215 @@
+\documentclass[DIN, pagenumber=false, fontsize=11pt, parskip=half]{scrartcl}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[utf8]{inputenc} % this is needed for umlauts
+\usepackage[T1]{fontenc} 
+\usepackage[ngerman]{babel}
+\usepackage{commath}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz-timing}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xstring}
+\usepackage{circuitikz}
+\usepackage{listings} % needed for the inclusion of source code
+\usepackage[final]{pdfpages}
+\usepackage{subcaption}
+\usepackage{import}
+\usepackage{cleveref}
+\usepackage{bm}
+\usepackage{url}
+
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\newcommand{\Prb}[1]{P(\text{#1})}
+\newcommand{\CPr}[2]{P(\text{#1}|\text{#2})}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\R}[0]{\mathbb{R}}
+
+%Inkscape fuckery
+\newcommand{\incfig}[2][\columnwidth]{%
+    \def\svgwidth{#1}
+    \import{./}{#2.eps_tex}
+}
+
+\title{Entwurfsmethodik Eingebetteter Echtzeitsysteme}
+\author{Paul Nykiel}
+
+\begin{document}
+    \maketitle
+    \section{Raumflug}
+    \begin{enumerate}[label=\alph*)]
+        \item Bei der Auswahl einer geeigneten Trajektorie zu einem anderen Himmelskörper
+            muss ein Kompromiss aus den Größen Flugzeit und Treibstoffverbrauch gefunden
+            werden. Der direkte Weg (\textit{direct ascent}) ist die schnellste Variante
+            braucht jedoch auch eine große Menge Treibstoff, folglich wird eine große
+            Trägerrakete benötigt oder die Traglast ist drastisch reduziert. Bei einer
+            Trajektorie welche einen (Teil-) Orbit um Erde und Mond beeinhaltet wird der
+            Treibstoffverbrauch erheblich reduziert. Dadurch ist es möglich kleinere
+            Trägerraketen zu nutzen und mehr Nutzlast mit sich zu führen (im Falle der
+            Apollo Missionen die Mondlandefähre und der Mondorbiter).
+
+            Da bereits die Saturn-V Rakete für damalige (und auch heutige) Verhältnisse
+            sehr groß war, entschieden sich die Ingenieure wohl für eine 
+            Hohmann-Trajektorie, in frühen Phasen der Entwicklung wurde jedoch auch ein
+            Direkaufstieg evaluiert. \footnote{\url{https://en.wikipedia.org/wiki/Direct_ascent}}
+
+            Ein weiter Vorteil der verwendeten Trajektorie ist es vor dem 
+            \textit{trans lunar injection burn} die Funktionalität aller Teilsysteme
+            im Erdorbit zu verifizieren. Ein \textit{direct ascent} macht einen 
+            Missionsabruch erheblich komplizierter.
+        \item Die Fluchtgeschwindigkeit der Erde beträgt $11186\frac{m}{s}$.
+            Ab dieser Geschwindigkeit steigt die Distanz eines Körpers zur Ende
+            kontinuierlich an: der Körper kann den Einflussbereich der Erdgravitation
+            (asymptotisch) verlassen. Dies lässt sich durch Betrachtung der Energien
+            erklären: ab der Fluchtgeschwindigkeit hat ein Körper mehr kinetische Energie
+            als er braucht um auf \glqq{}unendliche\grqq{} Höhe angehoben zu werden.
+            \footnote{\url{https://en.wikipedia.org/wiki/Escape_velocity}}
+        \item Das Startgewicht beträgt $2900000$ kg. Der Schub der ersten Stufe beträgt
+            33MN auf Meereshöhe und 40MN bei geringerem Luftdruck.
+            \footnote{\url{https://en.wikipedia.org/wiki/Saturn_V}}
+    
+            
+        \item Selbst wenn ein Körper ausreichend Energie hat um den Einflussbereich
+            der Erde zu verlassen so ist er immer noch im Einflussbereich der Sonne.
+            Die Sonne hat, aufgrund ihrer im Vergleich zur Erde deutlich größeren Masse,
+            eine Fluchtgeschwindigkeit von $617500\frac{m}{s}$. Solange diese 
+            Geschwindigkeit nicht erreicht ist bleibt der Körper in einem Sonnenorbit
+            und verlässt folglich das Sonnensystem nicht dauerhaft.
+        \item Der Satellit beginnt auf einem circulären Orbit um den Körper. Durch
+            einen ersten Impulstoß wird dieser Orbit stark elliptisch, der Satellit 
+            entfernt sich zuerst von dem Körper. Am Apogäum wird durch einen zweiten 
+            Impulsstoß der Orbit wieder auf eine Kreisförmigebahn verformt. Der Satellit
+            befindet sich nun wieder in einem circulären Orbit, jedoch auf einer höheren
+            Umlaufbahn.
+            \footnote{\url{https://en.wikipedia.org/wiki/Hohmann_transfer_orbit}}
+    \end{enumerate}
+
+    \section{Echtzeitanalyse}
+    \begin{enumerate}[label=\alph*)]
+        \item Der Artikel hat den Titel \glqq{}Scheduling Algorithms for Multiprogramming 
+            in a Hard-Real-Time Environment\grqq{} und ist z.B. auf der Website der
+            Universität von Radboud zu finden (\url{https://www.cs.ru.nl/~hooman/DES/liu-layland.pdf}).
+        \item Der Artikel begint damit fünf zentrale Annahmen über das untersuchte,
+            präemptive Multithreadingsystem zu machen:
+            \begin{enumerate}
+                \item Alle Tasks haben periodische Deadlines mit fixer Periode
+                \item Deadlines beziehen sich nur darauf, dass ein Task bis zu diesem
+                    Zeitpunkt beendet sein muss
+                \item Die Tasks sind unabhängig
+                \item Die Tasks haben jeweils konstante Laufzeit
+                \item Nicht periodische Tasks kommen im Regelbetrieb nicht vor und
+                    haben keine Echtzeitanforderungen
+            \end{enumerate}
+            Die Tasks werden mit $\tau_i$ bezeichnet, einzelnen Perioden mit 
+            $T_i$ sowie die Laufzeiten mit $C_i$ (jeweils $i \in \{1, \ldots, m\}$).
+
+            Unter diesen Annahmen werden dann drei Schedulingverfahren untersucht: ein
+            statisches Schedulingverfahren, ein dynamisches Schedulingverfahren sowie
+            ein hybrides Verfahren.
+
+            Für das statische Verfahren wird festgestellt, dass alle Schedulingprobleme
+            die statisch lösbar sind durch eine priorisierung anhand der Periodendauer
+            gelöst werden. Folglich kann diese priorisierung genutzt werden um zu testen
+            ob ein statisches Schedulingverfahren existiert, daher nennen die Autoren
+            dieses Verfahren optimal. Abschließend bestimmen die Autoren die maximale
+            Auslastung des Prozessors zu:
+            \begin{equation}
+                U = m \cdot \left(2^{\frac{1}{m}} -1 \right)
+            \end{equation}
+
+            Um diese Auslastung zu verbessern schlagen die Autoren ein dynamisches
+            Schedulingverfahren vor. Hierbei wird die Priorität auf Basis der nächsten
+            Deadline gewählt. Dieses Verfahren löst des Schedulingverfahren genau dann
+            wenn
+            \begin{equation}
+                \sum_i \frac{C_i}{T_i} \leq 1
+            \end{equation} 
+            Hierbei erfüllt der Algorithmus das gleiche Optimalitätskriterium wie das
+            statische Verfahren. Dieses Verfahren kann jedoch höhere Auslastungen
+            erreichen.
+
+            Als letztes Verfahren schlagen die Autoren ein hybrides Verfahren vor.
+            Dies begründen sie dadurch, dass Prozessoren zur damaligen Zeit nicht
+            fähig waren die priorisierung von Unterbrechungen dynamisch zu verändern.
+            Folglich können diese Prozessoren auf Hardware-Ebene nur statische
+            Schedulingverfahren verwenden. Dies resultiert im Ansatz die schnellsten
+            $k$ Tasks (geordnet nach Periode $T_i$) statisch zu verwalten sowie
+            die langsameren $m-k$ Tasks dynamisch zu verwalten, hierbei werden jeweils
+            die oben vorgestellten Verfahren genutzt. Auch durch dieses Verfahren kann
+            eine Lösung gefunden werden, die Auslastung ist jedoch geringer als bei der
+            rein dynamischen Verwaltung.
+    \end{enumerate}
+
+    \section{Begriffe}
+    \begin{enumerate}[label=\alph*)]
+        \item Ein eingebettes System ist ein Computersystem eingebettet in einen 
+            technischen Kontext
+        \item Eingebettet Systeme haben besondere Anforderung, z.B. an die 
+            Echtzeitfähigkeit aber auch an die Implementierung in Hardware,
+            z.B. in Form von Energie-, Kosten- und Größenlimitierungen.
+        \item Bei harten Echtzeitsystemen muss die Deadline zwingend immer eingehalten
+            werden. Weiche Echtzeitsysteme erfordern nur, dass das Einhalten der
+            Deadline einer bestimmten statistischen Verteilung folgt, z.B. dürfen
+            nicht mehr als 10\% aller Deadlines verpasst werden.
+        \item Ein \glqq{}Intellectual Property Core\grqq{} (IP-Core). Ist eine Komponente,
+            diese kann sowohl in Hardware wie auch in Software implementiert sein,
+            die eine bestimmte Funktion zur Verfügung stellt ohne dass der Anwender
+            (z.B. der Entwickler des Gesamtsystems) wissen über die innere Funktionsweise
+            der Komponente erlangen muss.
+        \item Ein System-On-a-Chip (SoC) ist ein hochintegriertes eingebettetes System,
+            dieses besteht nicht nur aus einem Prozessor sondern auch Peripherie wie
+            Speicher (sowohl RAM als auch persistenter Speicher), Sensoren (oftmals in 
+            MEMS-Bauform) und Kommunikationsschnittstellen (z.B. WLAN, Mobilfunk).
+    \end{enumerate}
+
+    \section{Zeit}
+    \begin{enumerate}[label=\alph*)]
+        \item Ein Sonnentag ist die Dauer zwischen zwei Meridiandurchgänge der Sonne
+            \footnote{\url{https://de.wikipedia.org/wiki/Sonnentag}}. Da dieser Aufgrund
+            des elliptischen Orbits der Erde um die Sonne leicht über den Verlauf eines
+            Jahres vaariert gibt es einen mittleren Sonnetag.
+        \item Es wird angenommen, dass es genau 12:00 wenn es in London bereits
+            16:00 ist. Folglich beträgt die Zeitverschiebung 4 Stunden, da jede
+            Stunde zu $15^\circ$ korrespondiert (da 
+            $\frac{360^\circ}{24h} = 15\frac{\circ}{\text{h}}$)
+            also befindet sich das Schiff auf $4 \cdot 15^\circ = 60^\circ$ westlicher
+            Breite.
+
+            In der Nähe befinden sich die Inseln Dominica und Martinique.
+        \item Neben der oben vorgestellten Methode zur Bestimmung von Zeit auf Basis
+            eines Sonnentages können auch andere periodische Prozesse genutzt werden.
+            Angefangen von mechanischen, schwingungsfähigen System wie Pendel über
+            elektronische Schwingkreise und Quarzoszillatoren.
+
+            Inzwischen werden Atomuhren als Zeitreferenz genutzt, hierbei wird die
+            Ressonanzfrequenz bestimmter Atome ausgenutzt und darüber eine Uhr
+            synchronisiert \footnote{\url{https://de.wikipedia.org/wiki/Atomuhr}}.
+            
+            Eine technische Norm muss hierbei die Vorgehensweise und Parameter
+            spezifizieren, so dass die Messung theoretisch von jeder Person reproduziert
+            werden kann. Im Falle der Atomuhr sind das Parameter wie das verwendete
+            Element, die Anzahl an Schwingungen die einer Zeiteinheit (z.B. Sekunde)
+            entsprechen, sowie die Eigenschaften des Regelkreises der die Ressonanzfrequenz
+            einregelt.
+
+            Die Bürgerliche Zeit wird in Deutschland durch das Einheiten- und
+            Zeitgesetz spezifiziert 
+            \footnote{\url{https://de.wikipedia.org/wiki/Gesetzliche_Zeit}},
+            dieses definiert die Zeit auf Basis der koordinierten Weltzeit (UTC),
+            welche durch das Internationale Büro für Maß und Gewicht bestimmt wird
+            \footnote{\url{https://de.wikipedia.org/wiki/Koordinierte_Weltzeit}}.
+            Für die Bestimmung der UTC wird internationale Atomzeit (TAI) genutzt
+            welche aus 600 Atomuhren als gewichtetes Mittel gebildet wird
+            \footnote{\url{https://de.wikipedia.org/wiki/Internationale_Atomzeit}}. 
+    \end{enumerate}
+    
+\end{document}

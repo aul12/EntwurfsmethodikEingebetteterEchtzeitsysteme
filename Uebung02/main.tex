@@ -1,0 +1,153 @@
+\documentclass[DIN, pagenumber=false, fontsize=11pt, parskip=half]{scrartcl}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[utf8]{inputenc} % this is needed for umlauts
+\usepackage[T1]{fontenc} 
+\usepackage[ngerman]{babel}
+\usepackage{commath}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz-timing}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xstring}
+\usepackage{circuitikz}
+\usepackage{listings} % needed for the inclusion of source code
+\usepackage[final]{pdfpages}
+\usepackage{subcaption}
+\usepackage{import}
+\usepackage{cleveref}
+\usepackage{bm}
+\usepackage{url}
+\usepackage{pgfplots}
+\usepackage{mathtools}
+
+
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\newcommand{\Prb}[1]{P(\text{#1})}
+\newcommand{\CPr}[2]{P(\text{#1}|\text{#2})}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\R}[0]{\mathbb{R}}
+
+%Inkscape fuckery
+\newcommand{\incfig}[2][\columnwidth]{%
+    \def\svgwidth{#1}
+    \import{./}{#2.eps_tex}
+}
+
+\title{Entwurfsmethodik Eingebetteter Echtzeitsysteme}
+\author{Paul Nykiel}
+
+\begin{document}
+    \maketitle
+    \section{Begriffe}
+    \begin{enumerate}[label=\alph*)]
+        \item Die Antwortzeit beschreibt die Zeit zwischen einem Ereignis und
+            der Reaktion des (Eigebetteten-) Systems auf dieses Ereignis. Die
+            Ausführungszeit ist in diesem Kontext ein Teil der Antwortzeit, und zwar
+            jene Zeit in der das eingebettete System das Ereignis verarbeitet und eine
+            Antwort bestimmt (also die Laufzeit des Algorithmus). Weitere Komponenten
+            der Antwortzeit ist unter anderem die Zeit die das eigebettete System
+            braucht bis mit der Ausführung des Algorithmus beginnt, diese wird
+            vor allem durch den Scheduler beeinflusst. 
+        \item Ein Kontrollflussgraph ist ein Graph, welcher sich auf den Programablauf
+            fokusiert. Dabei symbolisieren Knoten Anweisungen oder Kontrollstrukturen
+            und Kanten zeigen den Ablauf des Program. Ein Datenflussgraph ist die hierzu
+            duale Darstellung: hierbei wird sich auf die Verarbeitung von Daten 
+            konzentriert. Die Knoten des Graphens sind Operationen und Funktionen,
+            die Kanten des Graphens symbolisieren jeweils ein Datum.
+
+            Ein Grundblock ist ein Element eines Programs bei dem der Programfluss
+            nicht verzweigen kann. Es kann sich also um Operationen, Funktionen
+            oder auch Unterprogramme handeln, jedoch nicht um bedingte Sprünge.
+    \end{enumerate}
+
+    \section{Uhr} 
+    \begin{enumerate}[label=\alph*)]
+        \item
+            Eine Allgemeine Uhr wird beschrieben durch:
+            \begin{equation}
+                c(t) = \left\lfloor \frac{(1+g) t}{T} \right\rfloor G \mod M
+            \end{equation}
+            mit
+            \begin{itemize}
+                \item $g$: Gangfehler (Abweichung der Taktfrequenz von der korrekten
+                    Frequenz)
+                \item $T$: Auflösung (Zeit zwischen Uhrschritten)
+                \item $G$: Schrittweite (Inkrement pro Uhrschritt)
+                \item $M$: Periode (Zeit bis zur Wiederholung)
+            \end{itemize}
+        \item 
+            Siehe Abbildung \ref{fig:kennlinien}.
+            \begin{figure}[h]
+                \centering
+                \begin{tikzpicture}
+                    \begin{axis}[
+                                xlabel=$t$,
+                                ylabel=$c(t)$,
+                                domain=0:10
+                            ]
+                        \addplot[color=red]{0.9*x};
+                        \addplot[color=green]{x};
+                        \addplot[color=blue]{1.1*x};
+                    \end{axis}
+                \end{tikzpicture}
+                \caption{Kennlinien $c(t)$ dreier verschiedener Uhren:
+                    ideal (\textcolor{green}{grün}), zu schnell (\textcolor{blue}{blau}) 
+                    und zu langsam (\textcolor{red}{rot}).
+                    Es wird angenommen, dass die Uhren bei $t=0$ synchronisiert werden.}
+                \label{fig:kennlinien}
+            \end{figure}
+        \item Minimale Frequenz bei $f=1$kHz und einer Frequenzabweichung von $30$ppm:
+            \begin{equation}
+                f_\text{min} = f \cdot \left(1 - \frac{30}{{10}^6}\right) = 999.97\text{Hz}
+            \end{equation}
+            Maximale Frequenz:
+            \begin{equation}
+                f_\text{max} = f \cdot \left(1 + \frac{30}{{10}^6}\right) = 1000.03\text{Hz}
+            \end{equation}
+            Differenzfrequenz:
+            \begin{equation}
+                \Delta f = f_\text{max} - f_\text{min} = 0.06 \text{Hz}
+            \end{equation}
+
+            Anzahl an Takten:
+            \begin{eqnarray}
+                N_{1000\text{s}} &=& \Delta f \cdot 1000 \text{s} = 60 \\
+                N_{1 \text{Tag} } &=& \Delta f \cdot 86400 \text{s} = 5184 
+            \end{eqnarray}
+        \item 
+            Bei einem Frequenzfehler von $\pm30$ppm beträgt der Zeitfehler
+            $\pm \frac{3 \mu \text{s}}{\text{s}}$ relativ zur korrekten Zeit.
+            Dieses Verhalten ist in Abbildung \ref{fig:skew} visualisiert.
+            
+            \begin{figure}[h]
+                \centering
+                \begin{tikzpicture}
+                    \begin{axis}[
+                                xlabel=$t$,
+                                ylabel=$\abs{\Delta t}$,
+                                domain=0:1000
+                            ]
+                        \addplot[color=black]{0.00003*x};
+                    \end{axis}
+                \end{tikzpicture}
+                \caption{Maximale betragsmäßige Zeitabweichung, es wird eine
+                    Synchronisierung bei $t=0$ angenommen.}
+                \label{fig:skew}
+            \end{figure}
+        \item
+            Wenn die beiden Prozessoren über eine Schnittstelle welche keine
+            separate Taktsynchronisierung unterstützt kommunizieren so kann die
+            Frequenzabweichung zu Fehlern bei der Kommunikation führen, da die
+            Daten zu unterschiedlichen Zeitpunkten geschrieben wie gelesen werden.
+    \end{enumerate}
+\end{document}

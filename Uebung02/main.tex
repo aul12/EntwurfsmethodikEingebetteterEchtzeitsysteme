@@ -51,7 +51,7 @@
     \section{Begriffe}
     \begin{enumerate}[label=\alph*)]
         \item Die Antwortzeit beschreibt die Zeit zwischen einem Ereignis und
-            der Reaktion des (Eigebetteten-) Systems auf dieses Ereignis. Die
+            der Reaktion des (Eingebetteten-) Systems auf dieses Ereignis. Die
             Ausführungszeit ist in diesem Kontext ein Teil der Antwortzeit, und zwar
             jene Zeit in der das eingebettete System das Ereignis verarbeitet und eine
             Antwort bestimmt (also die Laufzeit des Algorithmus). Weitere Komponenten
@@ -126,7 +126,8 @@
             \end{eqnarray}
         \item 
             Bei einem Frequenzfehler von $\pm30$ppm beträgt der Zeitfehler
-            $\pm \frac{3 \mu \text{s}}{\text{s}}$ relativ zur korrekten Zeit.
+            $\pm \frac{30 \text{ms}}{\text{s}}$ relativ zur korrekten Zeit,
+            bzw. $\pm \frac{60 \text{ms}}{\text{s}}$ zwischen den zwei Systemen.
             Dieses Verhalten ist in Abbildung \ref{fig:skew} visualisiert.
             
             \begin{figure}[h]
@@ -137,7 +138,7 @@
                                 ylabel=$\abs{\Delta t}$,
                                 domain=0:1000
                             ]
-                        \addplot[color=black]{0.00003*x};
+                        \addplot[color=black]{0.03*x};
                     \end{axis}
                 \end{tikzpicture}
                 \caption{Maximale betragsmäßige Zeitabweichung, es wird eine

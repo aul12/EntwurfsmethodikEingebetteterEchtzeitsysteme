@@ -60,6 +60,31 @@
 
     \section{Entwurfsablauf}
     \begin{enumerate}[label=\alph*)]
-        \item a
+        \item Der Entwursablauf beginnt mit der Spezifikation, diese bestimmt die Aufgabe des ES, z.B.
+            in Form eines Algorithmus. Mit Bauteilen (sowohl Hardware als auch Software) aus der
+            Plattformbibliothek wird dann ein erstes Systemmodell erstellt. Aus diesem Modell werden
+            Parameter wie Ausführungszeiten und Energieverbrauch mithilfe einer intrinsischen Analyse
+            extrahiert. Die einzelnen Parameter werden dann in der extrinsischen Analyse um Parameter
+            des Gesamtssystems, z.B. die Antwortzeit und den gesamten Energieverbrauch zu bestimmen.
+            
+            Die Parameter des Gesamtsystems werden dann als Basis für eine Optimierung genutzt: die Architektur
+            und die Parameter der Systemkomponenten werden angepasst bis die optimale Systemarchitektur mit den
+            optimalen Parametern gefunden wurde.
+
+            Das optimale System (also das Ergebnis der Systemsynthese) wird dann implementiert, dabei können
+            Teilsysteme in Hardware und andere Teilsysteme in Software implementiert werden, je nach Resultat
+            der Optimierung.
+        \item Die Plattformbibliothek stellt fertige, aber parametrierbare Komponenten zur Verfügung aus denen
+            das Gesamtsystem aufgebaut werden kann. Diese Komponenten können in Hardware und Software implementiert
+            sein.
+        \item Die intrinsiche Analyse dient dem Extrahieren der Parameter aus den Teilsystemen. So kann beispielsweise
+            die Ausführungszeit eines (Teil-)Algorithmus (z.B. FFT) in einem der Komponenten (z.B. DSP), unter 
+            Berücksichtigung der gegebenen Parameter (z.B. Signallänge) bestimmt werden.
+        \item Bei der extrinsichen Analyse wird das Gesamtsystem \glqq{}von außen\grqq{} betrachtet. Die intrinsiche
+            Analyse betrachtet das Verhalten der einzelnen Teilkomponenten. 
+        \item Bei der Optimierung wird eine Gesamtsystemarchitektur als Kombination der Einzelsysteme bestimmt,
+            so dass das Gesamtsystem nach einem gegebenen Gütemaß optimal ist. Dabei werden verschiedene Ressourcen
+            (Allokation); verschiedene Aufteilung von Aufgaben an die Ressourcen (Bindung); und verschiedene
+            Schemata der Aufgabenbearbeitung (Ablaufplanung) getestet.
     \end{enumerate}
 \end{document}

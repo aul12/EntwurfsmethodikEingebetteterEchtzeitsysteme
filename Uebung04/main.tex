@@ -1,0 +1,143 @@
+\documentclass[DIN, pagenumber=false, fontsize=11pt, parskip=half]{scrartcl}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[utf8]{inputenc} % this is needed for umlauts
+\usepackage[T1]{fontenc} 
+\usepackage[ngerman]{babel}
+\usepackage{commath}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz-timing}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xstring}
+\usepackage{circuitikz}
+\usepackage{listings} % needed for the inclusion of source code
+\usepackage[final]{pdfpages}
+\usepackage{subcaption}
+\usepackage{import}
+\usepackage{cleveref}
+\usepackage{bm}
+\usepackage{url}
+\usepackage{pgfplots}
+\usepackage{mathtools}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\newcommand{\Prb}[1]{P(\text{#1})}
+\newcommand{\CPr}[2]{P(\text{#1}|\text{#2})}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\R}[0]{\mathbb{R}}
+
+%Inkscape fuckery
+\newcommand{\incfig}[2][\columnwidth]{%
+    \def\svgwidth{#1}
+    \import{./}{#2.eps_tex}
+}
+
+\title{Entwurfsmethodik Eingebetteter Echtzeitsysteme}
+\author{Paul Nykiel}
+
+\begin{document}
+    \maketitle
+    \section{Kontroll und Datenflussgraphen}
+    Siehe Abbildung \ref{fig:control} und \ref{fig:data}.
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{control.pdf}
+        \caption{Kontrollflussgraph}
+        \label{fig:control}
+    \end{figure}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{data.pdf}
+        \caption{Datenflussgraph}
+        \label{fig:data}
+    \end{figure}
+        
+    \section{Matlab}
+    \begin{enumerate}[label=\alph*)]
+        \item Aufgrund der unendlichen Summe kann der gegebene Ausdruck nicht direkt
+            mit Matlab implementiert werden. Deshalb folgt eine kurze Analyse
+            des Arguments der Summe:
+
+            Der erste Heaviside Ausdruck ist genau dann $1$ falls
+            \begin{equation}
+                t - np \geq 0 \Leftrightarrow t \geq n p
+            \end{equation}
+            sonst ist der Ausdruck $0$. Analog ist der zweite Heaviside Ausdruck
+            genau dann $1$ falls
+            \begin{equation}
+                np -t_a \geq 0 \Leftrightarrow np \geq t_a
+            \end{equation}
+            sonst ist der Ausdruck ebenfalls $0$. Für den dritten Heaviside Ausdruck
+            gilt, er ist genau dann $1$ falls
+            \begin{equation}
+                t_b - n p > 0 \Leftrightarrow t_b > n p
+            \end{equation}
+            sonst ebenfalls $0$ (im Vergleich zu den anderen beiden Ausdrücken
+            wird hier eine Lower Heaviside Funktion verwendet, daher das $>$ anstatt
+            $\geq$).
+
+            Damit das Argument der Summe nicht $0$ ist, müssen alle drei Heaviside
+            Ausdrücke $\neq 0$, in diesem Fall also $=1$ sein. Das heißt es muss
+            gelten:
+            \begin{equation}
+                t \geq n p \land np \geq t_a \land t_b > n p
+            \end{equation}
+            beziehungsweise
+            \begin{equation}
+                np \in [t_a, t_b) \land np \leq t
+            \end{equation}
+            Division durch $p$ ergibt:
+            \begin{equation}
+                n \in \left[ \frac{t_a}{p}, \frac{t_b}{p}\right) \land n \leq \frac{t}{p} 
+            \end{equation}
+            Somit ist die untere Grenze der Summe gegeben durch:
+            \begin{equation}
+                n^- = \ceil*{ \frac{t_a}{p} }
+            \end{equation}
+            die obere Grenze ist gegeben durch (die unterschiedlichen Ausdrücke
+            kommen durch die Unterscheidung zwischen $<$ und $\leq$):
+            \begin{equation}
+                n^+ = \min \left(
+                    \ceil*{\frac{t_b}{p}} - 1, 
+                    \floor*{\frac{t}{p}}
+                 \right)
+            \end{equation}
+            
+            Da das Argument der Summe für diesen Fall immer $1$ ist lässt sich somit
+            $\mathbb{E}$ schreiben als (vorrausgesetzt $n^+ \geq n^-$, sonst
+            ist die Summe $0$):
+            \begin{equation}
+                \mathbb{E}(t, \Delta^a_b) = n^+ - n^- + 1
+            \end{equation}
+
+            Die Implementierung in Matlab besteht aus dieser geschlossenen Form:
+            \lstinputlisting[language=Matlab,caption=\texttt{eventBound.m}]{eventBound.m}
+        \item
+            Es wurden verschiedene Werte mit folgendem Skript getestet:
+            \lstinputlisting[language=Matlab, caption=\texttt{main.m}, label=lst:main]{main.m}
+
+            mit denen im Skript angegebenen Werten wurde der Plot in Abbildung
+            \ref{fig:eventBound} erzeugt.
+
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=\textwidth]{eventBound.eps}
+                \caption{Matlab Plot zu Listing \ref{lst:main}}
+                \label{fig:eventBound}
+            \end{figure}
+    \end{enumerate}
+\end{document}

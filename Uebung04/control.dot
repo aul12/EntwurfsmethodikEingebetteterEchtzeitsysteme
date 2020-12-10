@@ -1,0 +1,68 @@
+digraph {
+    node [
+        shape = "box"
+    ]
+    fontname = "Helvetica"
+    fontsize = 8
+
+
+    assign [
+        label = "a_1 = a;\nb_1 = b;"
+    ]
+
+    while [
+        label = "b_1 != 0 ?"
+    ]
+
+    a1b1 [
+        label = "a_1 > b_1 ?"
+    ]
+
+    a1 [
+        label = "a_1 = a_1 - b_1;"
+    ]
+
+    b1 [
+        label = "b_1 = b_1 - a_1;"
+    ]
+
+    if [
+        label = "c == true?"
+    ]
+
+    x1x2 [
+        label = "x_1 = a * b;\nx_2 = x_1 / a_1;\nreturn x_2;"
+    ]
+
+    ret [
+        label = "return a_1;"
+    ]
+
+    assign -> while;
+    while -> a1b1 [
+        label = "true"
+    ] 
+
+    a1b1 -> a1 [
+        label = "true"
+    ]
+
+    a1b1 -> b1 [
+        label = "false"
+    ] 
+
+    a1 -> while;
+    b1 -> while;
+
+    while -> if [
+        label = "false"
+    ]
+
+    if -> x1x2 [
+        label = "true"
+    ]
+
+    if -> ret [
+        label = "false"
+    ]
+}

@@ -1,0 +1,46 @@
+digraph {
+    node [
+        shape = "circle"
+    ]
+    fontname = "Helvetica"
+    fontsize = 8
+
+    a1 [ label = "a"; shape=plaintext ];
+    a_11 [ label = "a_1"; shape=plaintext ];
+    a1 -> a_11
+
+    b1 [ label = "b"; shape=plaintext ];
+    b_11 [ label = "b_1"; shape=plaintext ];
+    b1 -> b_11
+
+    a_12 [ label = "a_1"; shape=plaintext ];
+    a_13 [ label = "a_1"; shape=plaintext ];
+    b_12 [ label = "b_1"; shape=plaintext ];
+    s1 [label = "-"]
+    a_12 -> s1;
+    b_12 -> s1;
+    s1 -> a_13; 
+
+    b_13 [ label = "b_1"; shape=plaintext ];
+    a_14 [ label = "a_1"; shape=plaintext ];
+    b_14 [ label = "b_1"; shape=plaintext ];
+    s2 [label = "-"]
+    b_13 -> s2;
+    a_14 -> s2;
+    s2 -> b_14; 
+
+    x_1 [ label = "x_1"; shape=plaintext ]; 
+    x_2 [ label = "x_2"; shape=plaintext ];
+    a2 [ label = "a"; shape=plaintext ];
+    b2 [ label = "b"; shape=plaintext ];
+    a_15 [label = "a_1"; shape=plaintext ];
+    m [ label = "*" ];
+    d [ label = "/" ];
+
+    a2 -> m;
+    b2 -> m;
+    m -> x_1;
+    a_15 -> d;
+    x_1 -> d;
+    d -> x_2;
+}

@@ -1,0 +1,104 @@
+\documentclass[DIN, pagenumber=false, fontsize=11pt, parskip=half]{scrartcl}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[utf8]{inputenc} % this is needed for umlauts
+\usepackage[T1]{fontenc} 
+\usepackage[ngerman]{babel}
+\usepackage{commath}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz-timing}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xstring}
+\usepackage{circuitikz}
+\usepackage{listings} % needed for the inclusion of source code
+\usepackage[final]{pdfpages}
+\usepackage{subcaption}
+\usepackage{import}
+\usepackage{cleveref}
+\usepackage{bm}
+\usepackage{url}
+\usepackage{pgfplots}
+\usepackage{mathtools}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\newcommand{\Prb}[1]{P(\text{#1})}
+\newcommand{\CPr}[2]{P(\text{#1}|\text{#2})}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\R}[0]{\mathbb{R}}
+
+%Inkscape fuckery
+\newcommand{\incfig}[2][\columnwidth]{%
+    \def\svgwidth{#1}
+    \import{./}{#2.eps_tex}
+}
+
+\title{Entwurfsmethodik Eingebetteter Echtzeitsysteme}
+\author{Paul Nykiel}
+
+\begin{document}
+    \maketitle
+    \section{Ereignissequenzen}
+    Die gewählten Parameter werden, falls es nicht eindeutig ist, durch die entsprechenden
+    Buchstaben mit Tilde bezeichnet. Die Parameter aus der Aufgabe haben nie Tilden.
+    \begin{enumerate}[label=\roman*)]
+        \item
+            \begin{enumerate}[label=\alph*)]
+                \item Periodische Ereignissequenz: $\tilde{p}=p$
+                \item PeriodischeEreignissequenz mit Jitter: $\tilde{p}=p$, Jitter: $j=0$
+                \item Sporadische, periodische Ereignissequenz: $p_i=0, p_0=p, n=1$
+                \item Periodische Ereignissequenz mit initialem Schub: $\tilde{p}=p=\tilde{a}, j=0$
+            \end{enumerate} 
+        \item
+            \begin{enumerate}[label=\alph*)]
+                \item Periodische Ereignissequenz: $\tilde{p}=a$
+                \item Periodische Ereignissequenz mit Jitter:
+                    
+                    Es wird ein Modell mit Jitter gewählt, hierfür wähle $\tilde{p}=a+\varepsilon$,
+                    $\tilde{j}=3 \varepsilon$, diese Wahl der Parameter garantiert, dass
+                    die Ereignisdichte immer eine obere Schranke ist.
+
+                    Betrachte die Ereignisdichte als Funktion von $\varepsilon$:
+                    \begin{equation}
+                        \eta_{t,a}(\varepsilon) 
+                            = \floor*{\frac{t+6 \varepsilon}{a+\varepsilon}}+1
+                    \end{equation}
+                    Die Funktion hat ihr minimum bei $\varepsilon=0$. Folglich
+                    ist die kleinste obere Schranke für das Modell
+                    Periodische Ereignissequenz mit Jitter für $\tilde{p}=a$ und $\tilde{j}=0$ gegeben.
+                \item Sporadische, periodische Ereignissequenz: $p_i=a, p_0=p, n=5$
+                \item Periodische Ereignissequenz mit initialem Schub: 
+                    $\tilde{p}=p \tilde{a}=a, \tilde{j}=4\cdot p - t$
+            \end{enumerate}
+        \item
+            \begin{enumerate}[label=\alph*)]
+                \item Periodische Ereignissequenz: $\tilde{p}=a$
+                \item PeriodischeEreignissequenz mit Jitter: 
+
+                    Die beiden Randwerte des Optimierungsproblems sind bei
+                    $\tilde{p}=a$ und $\tilde{p}=\frac{p}{3}$, $\tilde{j}$ ist gegeben
+                    durch $\tilde{j} = 2 \tilde{p} - 2 a$. Eine Optimierung der
+                    Ereignisdichte $\eta_{t,a}(p)$ führt zu einem Minimum bei
+                    $\tilde{p}=a, \tilde{j}=0$.
+                \item Sporadische, periodische Ereignissequenz: $p_i=a, p_0=p, n=3$
+                \item Periodische Ereignissequenz mit initialem Schub: 
+
+                    Da bis ins unendliche Ereignisse mit Abstand $a$ auftreten wähle
+                    die Parameter zu: $\tilde{p}=a, \tilde{a}=a, \tilde{j}=0$. Dann ergibt
+                    sich ein periodisches Modell mit Periode $a$.
+            \end{enumerate} 
+    \end{enumerate}
+\end{document}

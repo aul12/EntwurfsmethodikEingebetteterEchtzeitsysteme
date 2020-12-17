@@ -8,7 +8,7 @@ all: main.pdf
 show: main.pdf
 	$(SCREEN) -dm $(VIEWER) main.pdf
 
-main.pdf: main.tex
+main.pdf: main.tex control.pdf *.m
 	$(RUBBER) -d main.tex
 
 %.eps: %.svg

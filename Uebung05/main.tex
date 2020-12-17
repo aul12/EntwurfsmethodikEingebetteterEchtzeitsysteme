@@ -101,4 +101,183 @@
                     sich ein periodisches Modell mit Periode $a$.
             \end{enumerate} 
     \end{enumerate}
+
+    \section{Intrinsische Analyse}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{control.pdf}
+        \caption{Kontrollflussgraph mit benannten Kanten und Basisblöcken
+                aus dem vorherigen Übungsblatt}
+    \end{figure}
+
+    \begin{enumerate}[label=\alph*)]
+        \item
+            Für die Kanten gilt:
+            \begin{eqnarray}
+                d_1 + d_5 + d_6 &=& d_2 + d_7 \\
+                d_2 &=& d_3 + d_4 \\
+                d_3 &=& d_5 \\
+                d_6 &=& d_4 \\
+                d_7 &=& d_8 + d_9
+            \end{eqnarray} 
+
+            Für die Beziehung zwischen Knoten und Kanten gilt:
+            \begin{eqnarray}
+                x_1 &=& d_1 \\
+                x_2 &=& d_1 + d_5 + d_6 \\
+                x_3 &=& d_2 \\
+                x_4 &=& d_3 \\
+                x_4 &=& d_5 \\
+                x_5 &=& d_4 \\
+                x_5 &=& d_6 \\
+                x_6 &=& d_7 \\
+                x_7 &=& d_8 \\
+                x_8 &=& d_9
+            \end{eqnarray}
+
+            Damit lassen sich die strukturellen Randbedingungen formulieren:
+            \begin{eqnarray}
+                x_1 &=& x_2 \\
+                x_2 &=& x_3 + x_6 \\
+                x_3 &=& x_4 + x_5 \\
+                x_6 &=& x_2 \\
+                x_6 &=& x_7 + x_8
+            \end{eqnarray}
+        \item
+            Betrachtung der While-Schleife:
+            
+            Für den Fall $b=b_1=0$ wird die Schleifen gar nicht durchlaufen,
+            folglich gilt $x_2 \geq 1$. Das Maximum wird sowohl für
+            $a_1 = 65535, b_1 = 1$ sowie für $a_1=1, b_1=65535$ erreicht, beide
+            Fälle führen den Schleifenkörper 65535 mal aus, somit wird $x_2$
+            maximal 65536 mal geprüft. Also gilt:
+            \begin{equation}
+                1 \leq x_2 \leq 65536
+            \end{equation}
+
+            Außerdem lässt sich aus den oben genannten Fällen minima und maxima für
+            $x_4$ und $x_5$ ableiten:
+            \begin{eqnarray}
+                0 \leq &x_4& \leq 65534 \\
+                0 \leq &x_5& \leq 65535
+            \end{eqnarray}
+
+            Zudem gilt:
+            \begin{eqnarray}
+                x_1 &=& 1 \\
+                x_6 &=& 1
+            \end{eqnarray}
+            und
+            \begin{eqnarray}
+                0 \leq &x_7& \leq 1  \\ 
+                0 \leq &x_8& \leq 1 
+            \end{eqnarray}
+        \item
+            Es gilt:
+            \begin{eqnarray}
+                c^- &=& c_1 \cdot 1 \\
+                    &&+ c_2 \cdot 1 \\ 
+                    &&+ c_3 \cdot 0 \\
+                    &&+ c_4 \cdot 0 \\  
+                    &&+ c_5 \cdot 0 \\
+                    &&+ c_6 \cdot 1 \\
+                    &&+ c_7 \cdot 0 \\
+                    &&+ c_8 \cdot 1 \\
+                    &=& c_1 + c_2 + c_6 + c_8
+            \end{eqnarray}
+            und
+            \begin{eqnarray}
+                c^+ &=& c_1 \cdot 1 \\
+                    &&+ c_2 \cdot 65536 \\ 
+                    &&+ c_3 \cdot 65535 \\
+                    &&+ c_4 \cdot 0 \\  
+                    &&+ c_5 \cdot 65535 \\
+                    &&+ c_6 \cdot 1 \\
+                    &&+ c_7 \cdot 1 \\
+                    &&+ c_8 \cdot 0 \\
+                    &=& c_1 + 65536 \cdot c_2 + 65535 \cdot c_3 + 65535 \cdot c_5 + c_6 + c_7
+            \end{eqnarray}
+        \item 
+            Lauzeiten der Basisblöcke in Takten:
+            \begin{eqnarray}
+                c_1 &=& 1 + 1 = 2 \\
+                c_2 &=& 1 \\
+                c_3 &=& 1 \\
+                c_4 &=& 1 \\
+                c_5 &=& 1 \\
+                c_6 &=& 1 \\
+                c_7 &=& 6 + 10 = 16\\
+                c_8 &=& 0
+            \end{eqnarray}
+            
+            Damit ergeben sich die Ausführungszeiten zu:
+            \begin{eqnarray}
+                c^- &=& 2 + 1 + 1 + 0 = 4 \\
+                c^+ &=& 2 + 65536 \cdot 1 + 65535 \cdot 1 + 65535 \cdot 1 + 1 + 16
+                        = 196625
+            \end{eqnarray}
+    \end{enumerate}
+
+    \section{Lineares Optimierungsproblem}
+    \begin{enumerate}[label=\alph*)]
+        \item
+            Slack-Variablen Einfügen:
+            \begin{eqnarray}
+                2 x_1 + 3 x_2 + 2 x_3 + s_1 &=& 1000 \\
+                x_1 + x_2 + 2 x_3 + s_2 &=& 800
+            \end{eqnarray}
+            mit $s_1, s_2 \geq 0$.
+
+            Daraus folgt:
+            \begin{eqnarray}
+                A &=& \begin{pmatrix}
+                    2 & 3 & 2 & 1 & 0 \\
+                    1 & 1 & 2 & 0 & 1 \\
+                \end{pmatrix} \\
+                x &=& \begin{pmatrix}
+                    x_1 \\ x_2 \\ x_3 \\ s_1 \\ s_2
+                \end{pmatrix} \\
+                b &=& \begin{pmatrix}
+                    1000 \\ 800
+                \end{pmatrix} \\
+                c^\text{T} &=& \begin{pmatrix}
+                    7 & 8 & 10 & 0 & 0
+                \end{pmatrix}
+            \end{eqnarray}
+
+            Das Tableau ist gegeben durch
+            \begin{equation}
+                \begin{pmatrix}
+                    2 & 3 & 2 & 1 & 0 & 1000 \\
+                    1 & 1 & \mathbf{2} & 0 & 1 & 800  \\
+                    7 & 8 & 10 & 0 & 0 & 0
+                \end{pmatrix}
+            \end{equation} 
+            
+            Das Maximum (4400) wird für $x_1=0, x_2=-0.5, x_3=1$ erreicht. Siehe hierfür \ref{lst:main}
+            und \ref{lst:simpAlg}.
+        \item
+            Durch Einfügen von Slack-Variablen $s_1, s_2$ folgt:
+            \begin{eqnarray}
+                A &=& \begin{pmatrix}
+                    3 & 1 & 1 & 0 \\
+                    1 & 2 & 0 & 1
+                \end{pmatrix} \\
+                x &=& \begin{pmatrix}
+                    x_1 \\ x_2 \\ s_1 \\ s_2 
+                \end{pmatrix} \\
+                b &=& \begin{pmatrix}
+                    8 \\ 9
+                \end{pmatrix} \\
+                c^\text{T} &=& \begin{pmatrix}
+                    4 & 5 & 0 & 0
+                \end{pmatrix}
+            \end{eqnarray}
+            
+            Das Maximum (24.6) wird für $x_1=0, x_2=1$ erreicht. Siehe hierfür \ref{lst:main}
+            und \ref{lst:simpAlg}.
+        \item
+            \lstinputlisting[basicstyle=\scriptsize,language=Matlab,caption=\texttt{simpAlg.m},label=lst:simpAlg]{simpAlg.m}
+            \lstinputlisting[basicstyle=\scriptsize,language=Matlab,caption=\texttt{main.m},label=lst:main]{main.m}
+    \end{enumerate}
 \end{document}

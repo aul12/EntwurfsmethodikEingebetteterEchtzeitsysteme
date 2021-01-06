@@ -1,0 +1,116 @@
+\documentclass[DIN, pagenumber=false, fontsize=11pt, parskip=half]{scrartcl}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[utf8]{inputenc} % this is needed for umlauts
+\usepackage[T1]{fontenc} 
+\usepackage[ngerman]{babel}
+\usepackage{commath}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz-timing}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xstring}
+\usepackage{circuitikz}
+\usepackage{listings} % needed for the inclusion of source code
+\usepackage[final]{pdfpages}
+\usepackage{subcaption}
+\usepackage{import}
+\usepackage{cleveref}
+\usepackage{bm}
+\usepackage{url}
+\usepackage{pgfplots}
+\usepackage{mathtools}
+\usepackage{pgfgantt}
+\usepackage{rotating}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\newcommand{\Prb}[1]{P(\text{#1})}
+\newcommand{\CPr}[2]{P(\text{#1}|\text{#2})}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\R}[0]{\mathbb{R}}
+
+%Inkscape fuckery
+\newcommand{\incfig}[2][\columnwidth]{%
+    \def\svgwidth{#1}
+    \import{./}{#2.eps_tex}
+}
+
+\title{Entwurfsmethodik Eingebetteter Echtzeitsysteme}
+\author{Paul Nykiel}
+
+\begin{document}
+    \maketitle
+    \section{Ereignissequenz}
+    
+
+    \section{Gantt-Chart}
+    \subsection{Rate Monotonic Scheduling}
+    Siehe Abbildung \ref{fig:rms}. Hierbei hat $\tau_1$ die kleinste Periode, und damit
+    die höchste Priorität, gefolgt von $\tau_2$ und $\tau_3$.
+
+    \begin{sidewaysfigure}
+        \centering
+        \begin{ganttchart}{0}{39}
+            \gantttitlelist{0,1,...,39}{1} \\
+            \ganttbar{$\tau_1$}{0}{2}
+            \ganttbar{}{10}{12}
+            \ganttbar{}{20}{22}
+            \ganttbar{}{30}{32}
+            \\
+            \ganttbar{$\tau_2$}{3}{4} 
+            \ganttbar{}{15}{16} 
+            \ganttbar{}{33}{34} 
+            \\
+            \ganttbar{$\tau_3$}{5}{9}
+            \ganttbar{}{13}{14}
+            \ganttbar{}{17}{17}
+            \ganttbar{}{23}{29}
+            \ganttbar{}{35}{35}
+        \end{ganttchart}
+        \caption{}
+        \label{fig:rms}
+    \end{sidewaysfigure}
+
+    \subsection{Deadline Monotonic Scheduling}
+    Siehe Abbildung \ref{fig:rms}. Hierbei hat $\tau_1$ die kürzeste Deadline, und damit
+    die höchste Priorität, gefolgt von $\tau_2$ und $\tau_3$. Folglich gilt das in diesem
+    Fall RMS und DMS das selbe Ergebnis liefern.
+
+    \subsection{Earliest Deadline First}
+    Siehe Abbildung \ref{fig:edf}.
+
+    \begin{sidewaysfigure}
+        \centering
+        \begin{ganttchart}{0}{39}
+            \gantttitlelist{0,1,...,39}{1} \\
+            \ganttbar{$\tau_1$}{0}{2}
+            \ganttbar{}{10}{12}
+            \ganttbar{}{20}{22}
+            \ganttbar{}{30}{32}
+            \\
+            \ganttbar{$\tau_2$}{3}{4} 
+            \ganttbar{}{16}{17}
+            \ganttbar{}{34}{35}
+            \\
+            \ganttbar{$\tau_3$}{5}{9}
+            \ganttbar{}{13}{15}
+            \ganttbar{}{23}{29}
+            \ganttbar{}{33}{33}
+        \end{ganttchart}
+        \caption{}
+        \label{fig:edf}
+    \end{sidewaysfigure}
+\end{document}

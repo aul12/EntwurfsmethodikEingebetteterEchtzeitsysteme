@@ -1,0 +1,106 @@
+\documentclass[DIN, pagenumber=false, fontsize=11pt, parskip=half]{scrartcl}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[utf8]{inputenc} % this is needed for umlauts
+\usepackage[T1]{fontenc} 
+\usepackage[ngerman]{babel}
+\usepackage{commath}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz-timing}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xstring}
+\usepackage{circuitikz}
+\usepackage{listings} % needed for the inclusion of source code
+\usepackage[final]{pdfpages}
+\usepackage{subcaption}
+\usepackage{import}
+\usepackage{cleveref}
+\usepackage{bm}
+\usepackage{url}
+\usepackage{pgfplots}
+\usepackage{mathtools}
+\usepackage{pgfgantt}
+\usepackage{rotating}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\newcommand{\Prb}[1]{P(\text{#1})}
+\newcommand{\CPr}[2]{P(\text{#1}|\text{#2})}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\R}[0]{\mathbb{R}}
+
+%Inkscape fuckery
+\newcommand{\incfig}[2][\columnwidth]{%
+    \def\svgwidth{#1}
+    \import{./}{#2.eps_tex}
+}
+
+\title{Entwurfsmethodik Eingebetteter Echtzeitsysteme}
+\author{Paul Nykiel}
+
+\begin{document}
+    \maketitle
+    \section{Antwortzeit}
+    Für diese Aufgabe wurde der im Skript in Satz 20 vorgestellte Algorithmus mithilfe von Python implementiert,
+    siehe hierfür auch Abschnitt \ref{sec:app:response}.
+
+    \subsection{$\Gamma_2$}
+    Antwortzeiten für das erste Taskset:
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{cc}
+            \toprule
+                Task & $r_i$ \\ 
+            \midrule
+                $\tau_1$ & 1 \\
+                $\tau_2$ & 3 \\
+                $\tau_3$ & 7 \\
+                $\tau_4$ & 18 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    \subsection{$\Gamma_3$}
+    Antwortzeiten für das zweite Taskset:
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{cc}
+            \toprule
+                Task & $r_i$ \\ 
+            \midrule
+                $\tau_1$ & 1 \\
+                $\tau_2$ & 3 \\
+                $\tau_3$ & 10 \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+
+    \section{Busy Period}
+    Für die Busy Period kann ein Taskset bis zur Hyperperiode berechnet werden und dann
+    die längste Zeit ohne Task bestimmt werden.
+
+    Hierfür wurde ebenfalls ein Python Skript entwickelt, siehe Abschnitt \ref{sec:app:busy}.
+
+    Die maximale Busy Period für $\Gamma_4$ beträgt 23, für $\Gamma_5$ 17.
+
+    \appendix
+    \section{Antwortzeitanalyse} \label{sec:app:response}
+    \lstinputlisting[language=python, caption=\texttt{response.py}, label=lst:response]{response.py}
+
+    \section{Busy Period} \label{sec:app:busy}
+    \lstinputlisting[language=python, caption=\texttt{busy.py}]{busy.py}
+\end{document}

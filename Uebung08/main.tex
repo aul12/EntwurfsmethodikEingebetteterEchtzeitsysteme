@@ -1,0 +1,99 @@
+\documentclass[DIN, pagenumber=false, fontsize=11pt, parskip=half]{scrartcl}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[utf8]{inputenc} % this is needed for umlauts
+\usepackage[T1]{fontenc} 
+\usepackage[ngerman]{babel}
+\usepackage{commath}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz-timing}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xstring}
+\usepackage{circuitikz}
+\usepackage{listings} % needed for the inclusion of source code
+\usepackage[final]{pdfpages}
+\usepackage{subcaption}
+\usepackage{import}
+\usepackage{cleveref}
+\usepackage{bm}
+\usepackage{url}
+\usepackage{pgfplots}
+\usepackage{mathtools}
+\usepackage{pgfgantt}
+\usepackage{rotating}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\newcommand{\Prb}[1]{P(\text{#1})}
+\newcommand{\CPr}[2]{P(\text{#1}|\text{#2})}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\R}[0]{\mathbb{R}}
+
+%Inkscape fuckery
+\newcommand{\incfig}[2][\columnwidth]{%
+    \def\svgwidth{#1}
+    \import{./}{#2.eps_tex}
+}
+
+\title{Entwurfsmethodik Eingebetteter Echtzeitsysteme}
+\author{Paul Nykiel}
+
+\begin{document}
+    \maketitle
+    \section{Antwortzeit}
+    \begin{enumerate}[label=\alph*)]
+        \item Für die allgemeine Antwortzeitanalyse nach Theorem 8 müssen alle Tasks höherer Priorität betrachtet
+            werden. Da die Prioritäten auf Basis von DMS festgelegt werden müssen also alle Tasks mit kürzerer Deadline
+            betrachtet werden. Das heißt auf CPU 1 ist $\tau_3$, auf CPU 2 $\tau_5$ jeweils die Task mit größter 
+            Priorität. Für diese muss die Antwortzeit nicht mithilfe des Busy Windows Verfahrens bestimmt werden.
+
+            Bei $\tau_2$ ist die Deadline gleich der maximalen Ausführungszeit
+            daher muss dort auch nicht das Busy Windows Verfahren angewandt werden.
+        \item 
+            Für die Aufgabe wurde ein Python Skript implementiert, siehe Anhang \ref{app:sec:response}.
+
+            Die maximalen Antwortzeiten Betragen:
+            \begin{eqnarray}
+                r^+_{\tau_1} &=& 11 \\
+                r^+_{\tau_2} &=& 3 \\
+                r^+_{\tau_3} &=& 1 \\
+                r^+_{\tau_4} &=& 6 \\
+                r^+_{\tau_5} &=& 2
+            \end{eqnarray}
+    \end{enumerate}
+
+    \section{Antwortzeit}
+    Für die Aufgabe wurde ein Python Skript implementiert, siehe Anhang \ref{sec:app:jitter}.
+    \begin{enumerate}[label=\alph*)]
+        \item Der Jitter beträgt:
+            \begin{eqnarray}
+                J_4 &=& 27 \\
+                J_5 &=& 1
+            \end{eqnarray}
+        \item Die Minimale Antwortzeit beträgt:
+            \begin{equation}
+                r^-_{\tau_4} = 320
+            \end{equation} 
+    \end{enumerate}
+
+    \appendix
+    \section{Aufgabe 1} \label{app:sec:response}
+    \lstinputlisting[language=Python, caption=\texttt{response.py}]{response.py}
+
+    \section{Aufgabe 2} \label{app:sec:jitter}
+    \lstinputlisting[breaklines=True, language=Python, caption=\texttt{jitter.py}]{jitter.py}
+    
+\end{document}

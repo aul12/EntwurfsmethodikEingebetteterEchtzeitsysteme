@@ -1,0 +1,162 @@
+\documentclass[DIN, pagenumber=false, fontsize=11pt, parskip=half]{scrartcl}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage[utf8]{inputenc} % this is needed for umlauts
+\usepackage[T1]{fontenc} 
+\usepackage[ngerman]{babel}
+\usepackage{commath}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{tikz-timing}
+\usepackage{tikz}
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{xstring}
+\usepackage{circuitikz}
+\usepackage{listings} % needed for the inclusion of source code
+\usepackage[final]{pdfpages}
+\usepackage{subcaption}
+\usepackage{import}
+\usepackage{cleveref}
+\usepackage{bm}
+\usepackage{url}
+\usepackage{pgfplots}
+\usepackage{mathtools}
+\usepackage{pgfgantt}
+\usepackage{rotating}
+
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+
+\usetikzlibrary{calc,shapes.multipart,chains,arrows}
+
+\newcommand{\Prb}[1]{P(\text{#1})}
+\newcommand{\CPr}[2]{P(\text{#1}|\text{#2})}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator{\rank}{rank}
+\newcommand{\R}[0]{\mathbb{R}}
+
+%Inkscape fuckery
+\newcommand{\incfig}[2][\columnwidth]{%
+    \def\svgwidth{#1}
+    \import{./}{#2.eps_tex}
+}
+
+\title{Entwurfsmethodik Eingebetteter Echtzeitsysteme}
+\author{Paul Nykiel}
+
+\begin{document}
+    \maketitle
+    \section{Auslastungsanalyse und Testgrenzen}
+    \begin{enumerate}[label=\alph*)]
+        \item
+            Es gilt:
+            \begin{equation}
+                U = \sum_{\tau \in \Gamma} \frac{c^+_\tau}{p_\tau}
+                    = \frac{5}{10} + \frac{10}{55} + \frac{15}{100} + \frac{20}{200}
+                    = 0.93
+            \end{equation}
+            da $U = 0.93 \leq 1$ kann die Taskmenge nach Fristen geplanten werden.
+        \item
+            Die Hyperperiode beträgt:
+            \begin{equation}
+                H = \text{lcm}(10, 55, 100, 200) = 2200
+            \end{equation}
+            
+            Testgrenze nach Baruah:
+            \begin{equation}
+                h'_\tau = \frac{U}{1-U} \max_{\tau \in \Gamma} \left(p_\tau - d_\tau\right)
+                        = \frac{0.93}{1-0.93} (200-150) < 684
+            \end{equation} 
+
+            Testgrenze nach Ripoll:
+            \begin{equation}
+                h''_\tau = \frac{\sum_{\tau \in \Gamma} (p_\tau - d_\tau) \frac{c_\tau}{p_\tau}}{1 - U} = \frac{13.98}{1-0.93} < 206
+            \end{equation}
+
+            Testpunkte bis zur Hyperperiode:
+            \begin{equation}
+                n_\text{Hyper} = \frac{2200}{5} = 440
+            \end{equation}
+
+            Testpunkte bis zur Testgrenze nach Baruah:
+            \begin{equation}
+                n_\text{Baruah} = \frac{684}{5} < 137
+            \end{equation}
+
+            Testpunkte bis zur Testgrenze nach Ripoll:
+            \begin{equation}
+                n_\text{Ripoll} = \frac{206}{5} < 42
+            \end{equation}
+
+            Es wird die Testgrenze nach Ripoll gewählt. Für die Überprüfung der Rechnenzeit
+            wurde ein Python Skript implementiert, siehe hierfür Anhang 
+            \ref{sec:app:rechenzeit}. Der Test ergibt, dass die Taskmenge geplannt werden
+            kann.
+    \end{enumerate}
+
+    \section{Approximation durch straffen der Periode}
+    \begin{enumerate}[label=\alph*)]
+        \item
+            Die Taskperioden sind teilerfremd, daher ist die Hyperperiode das Produkt
+            der einzelnen Perioden
+            \begin{equation}
+                H = \prod_{\tau \in \Gamma} p_\tau = 43890
+            \end{equation}
+            da die Perioden Teilerfremd sind werden genauso viele Testpunkte benötigt.
+        \item
+            Wähle $p_3$ zu $55$, dann gilt:
+            \begin{equation}
+                \tilde{H} = 770
+            \end{equation}
+            Da $22$ und $35$ weiterhin teilerfremd sind werden auch $720$ Testpunkte
+            benötigt.
+
+            Für die Analyse wurde das Python Skript aus der vorherigen Aufgabe modizifiert,
+            siehe Anhang \ref{sec:app:rechenzeit2}. Der Test ergibt, dass die Taskmenge
+            geplannt werden kann.
+        \item
+            Es gilt $d \leq p$. Mit Satz 12 gilt dann:
+            \begin{eqnarray}
+                && \sum_{\tau \in \Gamma} \floor*{\frac{\Delta t - d_\tau}{p_\tau} + 1} c^+_\tau\\
+                &\leq& \sum_{\tau \in \Gamma} \floor*{\frac{\Delta t - d_\tau}{d_\tau} + 1} c^+_\tau\\
+                &=& \sum_{\tau \in \Gamma} \floor*{\frac{\Delta t}{d_\tau} - 1 + 1} c^+_\tau\\
+                &=& \sum_{\tau \in \Gamma} \floor*{\frac{\Delta t}{d_\tau}} c^+_\tau\\
+                &\leq& \sum_{\tau \in \Gamma} \frac{\Delta t}{d_\tau} c^+_\tau\\
+                &=& \Delta t \sum_{\tau \in \Gamma} \frac{c^+_\tau}{d_\tau}\\
+            \end{eqnarray}
+
+            Zudem gilt:
+            \begin{equation}
+                \sum_{\tau \in \Gamma} \frac{c^+_\tau}{d_\tau} \leq 1 \Leftrightarrow
+                \Delta t \sum_{\tau \in \Gamma} \frac{c^+_\tau}{d_\tau} \leq \Delta t
+            \end{equation}
+            D.h.
+            \begin{equation}
+                \sum_{\tau \in \Gamma} \frac{c^+_\tau}{d_\tau} \leq 1 \Rightarrow
+                \sum_{\tau \in \Gamma} \floor*{\frac{\Delta t - d_\tau}{p_\tau} + 1} c^+_\tau < 
+                \Delta t
+            \end{equation}
+            Damit ist ein notwendiger Test, der in konstanter Zeit berechnet werden kann gefunden.
+
+            Für das gegebene Taskset gilt:
+            \begin{equation}
+                \sum_{\tau \in \Gamma} \frac{c^+_\tau}{d_\tau} = 1 \leq 1
+            \end{equation}
+            folglich ergibt der Test, dass das Taskset planbar ist.
+    \end{enumerate} 
+
+
+    \appendix
+    \section{Rechenzeit} \label{sec:app:rechenzeit}
+    \lstinputlisting[language=Python,caption=\texttt{rechenzeit.py}]{rechenzeit.py}
+
+    \section{Rechenzeit 2} \label{sec:app:rechenzeit2}
+    \lstinputlisting[language=Python,caption=\texttt{rechenzeit2.py}]{rechenzeit2.py}
+\end{document}
